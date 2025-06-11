@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
@@ -21,56 +22,94 @@ const ThemeProviderContext = createContext<ThemeProviderState | undefined>(undef
 export function ThemeProvider({
   children,
   defaultTheme = "system",
-  storageKey = "vite-ui-theme",
+  storageKey = "ui-theme", // Changed vite-ui-theme to a more generic ui-theme
 }: ThemeProviderProps) {
-  const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof window === 'undefined') {
-      return defaultTheme;
-    }
-    return (localStorage.getItem(storageKey) as Theme) || defaultTheme;
-  });
+  const [theme, setThemeState] = useState<Theme | undefined>(undefined);
+  const [resolvedTheme, setResolvedThemeState] = useState<"light" | "dark" | undefined>(undefined);
+  const [mounted, setMounted] = useState(false);
 
-  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
-
+  // Effect to set mounted and read initial theme from localStorage
   useEffect(() => {
+    setMounted(true);
+    let initialTheme: Theme;
+    try {
+      const storedTheme = localStorage.getItem(storageKey) as Theme | null;
+      if (storedTheme) {
+        initialTheme = storedTheme;
+      } else {
+        initialTheme = defaultTheme;
+      }
+    } catch (e) {
+      // localStorage might be disabled
+      initialTheme = defaultTheme;
+    }
+    setThemeState(initialTheme);
+  }, [defaultTheme, storageKey]);
+
+  // Effect to apply theme to DOM and update resolvedTheme
+  useEffect(() => {
+    if (theme === undefined || !mounted) {
+      // Set a default resolvedTheme if not mounted or theme is not yet determined.
+      // This helps consumers like ThemeToggle have a non-undefined value.
+      if (!resolvedTheme) { // Only set if not already set by a previous run or init
+        setResolvedThemeState(defaultTheme === 'dark' || defaultTheme === 'light' ? defaultTheme : 'light');
+      }
+      return;
+    }
+
     const root = window.document.documentElement;
     root.classList.remove("light", "dark");
 
-    let currentTheme: "light" | "dark";
+    let currentAppliedTheme: "light" | "dark";
     if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-      root.classList.add(systemTheme);
-      currentTheme = systemTheme;
+      const systemPref = window.matchMedia("(prefers-color-scheme: dark)");
+      currentAppliedTheme = systemPref.matches ? "dark" : "light";
     } else {
-      root.classList.add(theme);
-      currentTheme = theme;
+      currentAppliedTheme = theme;
     }
-    setResolvedTheme(currentTheme);
-  }, [theme]);
+
+    root.classList.add(currentAppliedTheme);
+    setResolvedThemeState(currentAppliedTheme);
+
+    // Listener for system theme changes
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = () => {
+      if (theme === "system") { // only update if current theme is system
+        const newSystemTheme = mediaQuery.matches ? "dark" : "light";
+        root.classList.remove("light", "dark");
+        root.classList.add(newSystemTheme);
+        setResolvedThemeState(newSystemTheme);
+      }
+    };
+
+    if (theme === "system") {
+      mediaQuery.addEventListener("change", handleChange);
+    }
+
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange);
+    };
+  }, [theme, mounted, defaultTheme, resolvedTheme]); // Added defaultTheme and resolvedTheme to dependencies for initial set
 
   const setTheme = (newTheme: Theme) => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(storageKey, newTheme);
+    if (mounted) {
+      try {
+        localStorage.setItem(storageKey, newTheme);
+      } catch (e) {
+        // localStorage might be disabled
+      }
     }
     setThemeState(newTheme);
   };
   
-  // Effect to set initial resolved theme, especially for SSR/hydration
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      let initialResolved: "light" | "dark";
-      if (theme === "system") {
-        initialResolved = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-      } else {
-        initialResolved = theme;
-      }
-      setResolvedTheme(initialResolved);
-    }
-  }, []);
-
+  const contextValue = {
+    theme: theme === undefined ? defaultTheme : theme,
+    setTheme,
+    resolvedTheme: resolvedTheme === undefined ? (defaultTheme === 'dark' || defaultTheme === 'light' ? defaultTheme : 'light') : resolvedTheme,
+  };
 
   return (
-    <ThemeProviderContext.Provider value={{ theme, setTheme, resolvedTheme }}>
+    <ThemeProviderContext.Provider value={contextValue}>
       {children}
     </ThemeProviderContext.Provider>
   );
