@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { BrainCircuit } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'SciQra Insights',
+  title: 'AskSciQra',
   description: 'AI-Powered Question Answering with Citations',
 };
 
@@ -28,7 +28,7 @@ export default function RootLayout({
             <Sidebar className="bg-card border-r" collapsible="icon">
               <SidebarHeader className="p-4 flex items-center gap-2">
                  <BrainCircuit className="h-8 w-8 text-primary" />
-                 <h1 className="text-xl font-headline font-semibold group-data-[collapsible=icon]:hidden">SciQra</h1>
+                 <h1 className="text-xl font-headline font-semibold group-data-[collapsible=icon]:hidden">AskSciQra</h1>
               </SidebarHeader>
               {/* Add SidebarMenu here if navigation items are needed later, e.g. for History page */}
             </Sidebar>

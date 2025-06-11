@@ -1,13 +1,15 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { AppHeader } from '@/components/shared/header';
 import { ChatInput } from '@/components/chat/chat-input';
 import { MessageList } from '@/components/chat/message-list';
 import type { Message, Source } from '@/types';
 import { generateInsights, GenerateInsightsInput, GenerateInsightsOutput } from '@/ai/flows/generate-insights';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+import { ThemeToggle } from '@/components/shared/theme-toggle';
+
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -19,9 +21,9 @@ export default function ChatPage() {
       {
         id: 'initial-greeting',
         type: 'ai',
-        text: "Hello! I'm SciQra, your AI assistant for scientific insights. How can I help you today?",
+        text: "Hello! I'm AskSciQra, your AI assistant for scientific insights. How can I help you today?",
         sources: [],
-        rawAnswer: "Hello! I'm SciQra, your AI assistant for scientific insights. How can I help you today?",
+        rawAnswer: "Hello! I'm AskSciQra, your AI assistant for scientific insights. How can I help you today?",
       }
     ]);
   }, []);
@@ -78,12 +80,18 @@ export default function ChatPage() {
 
   return (
     <div className="flex flex-col h-screen bg-background">
-      <AppHeader />
+      <div className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 md:px-6">
+        <SidebarTrigger className="md:hidden" />
+        <h1 className="text-2xl font-headline font-semibold flex-1">
+          AskSciQra
+        </h1>
+        <ThemeToggle />
+      </div>
       <div className="flex-1 flex flex-col overflow-hidden">
         {messages.length <= 1 && !isLoading && (
             <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-                <Image src="https://placehold.co/120x120.png" alt="SciQra Logo" width={120} height={120} className="rounded-full mb-6 shadow-md" data-ai-hint="science abstract" />
-                <h2 className="text-2xl font-headline font-semibold mb-2 text-foreground">Welcome to SciQra Insights</h2>
+                <Image src="https://placehold.co/120x120.png" alt="AskSciQra Logo" width={120} height={120} className="rounded-full mb-6 shadow-md" data-ai-hint="science abstract" />
+                <h2 className="text-2xl font-headline font-semibold mb-2 text-foreground">Welcome to AskSciQra</h2>
                 <p className="text-muted-foreground mb-6 max-w-md">
                     Ask any scientific question and get answers backed by reliable sources.
                 </p>
