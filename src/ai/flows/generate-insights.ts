@@ -22,7 +22,7 @@ const GenerateInsightsOutputSchema = z.object({
   sources: z.array(
     z.object({
       title: z.string().describe('The title of the source.'),
-      url: z.string().url().describe('The URL of the source.'),
+      url: z.string().describe('The URL of the source.'),
     })
   ).describe('The list of sources used to generate the answer.'),
 });
