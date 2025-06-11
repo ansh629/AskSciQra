@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -32,7 +33,7 @@ type SidebarContext = {
   setOpen: (open: boolean) => void
   openMobile: boolean
   setOpenMobile: (open: boolean) => void
-  isMobile: boolean
+  isMobile: boolean | undefined
   toggleSidebar: () => void
 }
 
@@ -91,9 +92,10 @@ const SidebarProvider = React.forwardRef<
 
     // Helper to toggle the sidebar.
     const toggleSidebar = React.useCallback(() => {
+      if (isMobile === undefined) return; // Guard against undefined isMobile
       return isMobile
-        ? setOpenMobile((open) => !open)
-        : setOpen((open) => !open)
+        ? setOpenMobile((current) => !current)
+        : setOpen((current) => !current)
     }, [isMobile, setOpen, setOpenMobile])
 
     // Adds a keyboard shortcut to toggle the sidebar.
@@ -121,7 +123,7 @@ const SidebarProvider = React.forwardRef<
         state,
         open,
         setOpen,
-        isMobile,
+        isMobile, // isMobile can be undefined
         openMobile,
         setOpenMobile,
         toggleSidebar,
@@ -176,6 +178,10 @@ const Sidebar = React.forwardRef<
     ref
   ) => {
     const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+
+    if (isMobile === undefined) {
+      return null; // Render nothing if isMobile is not yet determined
+    }
 
     if (collapsible === "none") {
       return (
@@ -583,7 +589,8 @@ const SidebarMenuButton = React.forwardRef<
         <TooltipContent
           side="right"
           align="center"
-          hidden={state !== "collapsed" || isMobile}
+          // Hide tooltip if isMobile is not determined or true, or if sidebar is expanded
+          hidden={isMobile === undefined || isMobile || state !== "collapsed"}
           {...tooltip}
         />
       </Tooltip>
