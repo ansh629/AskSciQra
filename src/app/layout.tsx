@@ -4,7 +4,7 @@ import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { SidebarProvider, Sidebar, SidebarInset, SidebarHeader, SidebarTrigger } from '@/components/ui/sidebar';
 import { Toaster } from "@/components/ui/toaster";
-import { BrainCircuit } from 'lucide-react';
+import Image from 'next/image';
 
 export const metadata: Metadata = {
   title: 'AskSciQra',
@@ -28,7 +28,7 @@ export default function RootLayout({
           <SidebarProvider defaultOpen={true}>
             <Sidebar className="bg-card border-r" collapsible="icon">
               <SidebarHeader className="p-4 flex items-center gap-2">
-                 <BrainCircuit className="h-8 w-8 text-primary" />
+                 <Image src="https://placehold.co/32x32.png" alt="AskSciQra Logo" width={32} height={32} data-ai-hint="logo" />
                  <h1 className="text-xl font-headline font-semibold group-data-[collapsible=icon]:hidden">AskSciQra</h1>
               </SidebarHeader>
               {/* Add SidebarMenu here if navigation items are needed later, e.g. for History page */}

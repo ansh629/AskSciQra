@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -90,7 +91,7 @@ export default function ChatPage() {
       <div className="flex-1 flex flex-col overflow-hidden">
         {messages.length <= 1 && !isLoading && (
             <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-                <Image src="https://placehold.co/120x120.png" alt="AskSciQra Logo" width={120} height={120} className="rounded-full mb-6 shadow-md" data-ai-hint="science abstract" />
+                <Image src="https://placehold.co/120x120.png" alt="AskSciQra Logo" width={120} height={120} className="rounded-full mb-6 shadow-md" data-ai-hint="logo" />
                 <h2 className="text-2xl font-headline font-semibold mb-2 text-foreground">Welcome to AskSciQra</h2>
                 <p className="text-muted-foreground mb-6 max-w-md">
                     Ask any scientific question and get answers backed by reliable sources.
